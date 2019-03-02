@@ -1,6 +1,7 @@
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import Controller.NoteBankController;
 import org.xml.sax.SAXException;
 
 public class Main {
