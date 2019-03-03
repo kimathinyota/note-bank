@@ -11,13 +11,13 @@ public class HelpMenu extends JMenu {
         setMnemonic(KeyEvent.VK_H);
 
         JMenuItem helpItem = new JMenuItem("Help");
-        helpItem.setMnemonic(KeyEvent.VK_H);
+        //helpItem.setMnemonic(KeyEvent.VK_H);
         add(helpItem);
         helpItem.addActionListener(eventHandler::helpWindow);
 
         JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.setMnemonic(KeyEvent.VK_A);
+        //aboutItem.setMnemonic(KeyEvent.VK_A);
         add(aboutItem);
         aboutItem.addActionListener(eventHandler::aboutWindow);
-}
+    }
 }

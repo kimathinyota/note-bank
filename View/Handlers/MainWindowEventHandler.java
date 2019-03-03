@@ -59,6 +59,10 @@ public interface MainWindowEventHandler {
     void aboutWindow(ActionEvent e);
 
 
+    void createQuiz(ActionEvent e);
+
+
+
 }
 
 

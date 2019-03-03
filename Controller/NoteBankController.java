@@ -2,27 +2,15 @@ package Controller;
 
 import Model.*;
 import View.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 /**
@@ -166,6 +154,7 @@ public class NoteBankController {
 	
 	public void addNote(Note note, List<String>subjects) {
 		this.noteBankView.manageNoteBankPage.addNotes(note, subjects);
+
 	}
 	
 	public void save() {
@@ -199,12 +188,16 @@ public class NoteBankController {
 		this.allNotes = new HashMap<Note,List<String> >();
 		this.xmlFileName = "save";
 		String xmlFileLocation = pathToDirectory + this.xmlFileName + ".xml";
-		
+
+
+
 		this.maxWeightedAverageSimulationPerTime = ( 100*1 + 50*3 + 25*10 )/100; 
 		// corresponds to studying: once in last hour, 3 times in last day and 10 times in last week
+
 		try {
 			subjectReader = new SubjectReader(pathToDirectory);
 			this.allNotes = subjectReader.getAllNotes(this.setUpNoteBank());
+
 			File xmlFile = new File(xmlFileLocation);
 			this.allTopics = new Topic("All Topics");
 
@@ -223,18 +216,18 @@ public class NoteBankController {
 		ManageNoteBankController manageNoteBankController = new ManageNoteBankController(this);
 		ManageIdeasController manageIdeasController = new ManageIdeasController(this);
 		QuizSetUpController quizSetUpController = new QuizSetUpController(this);
+		MainWindowController mainWindowController = new MainWindowController(this);
 		
-		noteBankView = new NoteBankView(allTopics, allNotes, manageNoteBankController, manageIdeasController, quizSetUpController);
+		noteBankView = new NoteBankView(allTopics, allNotes, manageNoteBankController, manageIdeasController, quizSetUpController,mainWindowController);
 		int numOfIdeas = allTopics.getAllIdeas().size();
-		int minNumOfIdeas = 1;
-		if(numOfIdeas<1) {
-			minNumOfIdeas = 0;
-			numOfIdeas = 0;
-		}
+		numOfIdeas = (numOfIdeas<1 ? 0 : numOfIdeas);
+		int minNumOfIdeas = (numOfIdeas<1 ? 0: 1);
+
 		noteBankView.quizSetUpPage.setSliderMinMax(minNumOfIdeas, numOfIdeas );
 		for(Topic topic: allTopics.getTopics()) {
 			noteBankView.quizSetUpPage.addTopic(topic);
 		}
 
 	}
+
 }

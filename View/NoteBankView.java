@@ -5,18 +5,18 @@ import Controller.ManageNoteBankController;
 import Controller.QuizSetUpController;
 import Model.Note;
 import Model.Topic;
+import View.Handlers.MainWindowEventHandler;
+import View.Handlers.ManageIdeasEventHandler;
+import View.Handlers.ManageNoteBankPageEventHandler;
+import View.Handlers.QuizSetUpEventHandler;
+import View.MainWindowMenu.MainMenuBar;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 public class NoteBankView extends JFrame{
@@ -25,6 +25,12 @@ public class NoteBankView extends JFrame{
 	public ManageNoteBankPage manageNoteBankPage;
 	public QuizSetUpPage quizSetUpPage;
 	public JTabbedPane navigationPane;
+	private MainMenuBar menuBar;
+
+	public MainMenuBar getMenus(){
+		return this.menuBar;
+
+	}
 
 	private Stack<Map<JPanel, String>> deletedPagesStack;
 	
@@ -99,11 +105,18 @@ public class NoteBankView extends JFrame{
 	
 
 		
-	public NoteBankView(Topic allTopics, HashMap<Note,List<String>>allNotes, ManageNoteBankController manageNoteBankController,
-						ManageIdeasController manageIdeasController, QuizSetUpController quizSetUpController) {
+	public NoteBankView(Topic allTopics, HashMap<Note,List<String>>allNotes, ManageNoteBankPageEventHandler manageNoteBankController,
+						ManageIdeasEventHandler manageIdeasController, QuizSetUpEventHandler quizSetUpController, MainWindowEventHandler mainHandler) {
 
-		JFrame noteBankProgram = new JFrame("Note Bank");
-		noteBankProgram.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e){
+			System.out.println("No Default UI");
+		}
+
+		this.setTitle("Note Bank");
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		navigationPane = new JTabbedPane(JTabbedPane.BOTTOM);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		navigationPane.setPreferredSize(	new Dimension((int) (screenSize.getWidth()*0.5), (int) (0.85*screenSize.getHeight())) );
@@ -118,16 +131,21 @@ public class NoteBankView extends JFrame{
 		navigationPane.addTab("Manage Note Bank", manageNoteBankPage);
 		navigationPane.addTab("Manage Ideas", manageIdeasPage);
 		navigationPane.addTab("Revision Quiz", quizSetUpPage);
-		//scrollPane.add(navigationPane);
 
 		navigationPane.setSelectedIndex(0);
+
+
+
+		menuBar = new MainMenuBar(mainHandler,ManageNoteBankPage.getAllSubjects(allNotes));
+
+		this.setJMenuBar(menuBar);
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout( new GridLayout(1,1) );
 		mainPanel.add(navigationPane);
-		noteBankProgram.setContentPane(mainPanel);
-		noteBankProgram.pack();
-		noteBankProgram.setVisible(true);
+		this.setContentPane(mainPanel);
+		this.pack();
+		this.setVisible(true);
 	}
 	
 }

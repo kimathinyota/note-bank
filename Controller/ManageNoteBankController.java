@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Note;
 
+import View.CreateAnIdeaPage;
 import View.Handlers.ManageNoteBankPageEventHandler;
 import View.ManageNoteBankPage;
 import View.NoteBankView;
@@ -45,9 +46,9 @@ public class ManageNoteBankController implements ManageNoteBankPageEventHandler 
             view.addFixedPage(viewNotesController.getViewNotes(), "Select Notes to Add to Idea");
         }else {
             CreateAnIdeaController createAnIdeaController = new CreateAnIdeaController(controller);
-            createAnIdeaController.getCreateAnIdeaPage().setPreviousPage(view.manageNoteBankPage);
-            view.addFixedPage(createAnIdeaController.getCreateAnIdeaPage(), "Create an Idea");
-
+            CreateAnIdeaPage createAnIdeaPage = createAnIdeaController.getCreateAnIdeaPage();
+            createAnIdeaPage.setPreviousPage(view.manageNoteBankPage);
+            view.addFixedPage(createAnIdeaPage, "Create an Idea");
         }
     }
 

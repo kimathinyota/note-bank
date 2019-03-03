@@ -23,16 +23,6 @@ public class QuizSetUpController implements QuizSetUpEventHandler {
 
     @Override
     public void createQuiz(ActionEvent e) {
-        QuizSetUpPage quizSetUpPage = controller.getView().quizSetUpPage;
-        NoteBankView view = controller.getView();
-        Topic selectedItem = quizSetUpPage.getTopicChosen();
-        if(selectedItem!=null) {
-            view.quizSetUpPage.setSliderMinMax(1, selectedItem.getAllIdeas().size());
-        }
-    }
-
-    @Override
-    public void chooseTopic(ActionEvent e) {
         /**
          * private Map<Idea,Integer> simulatedIdeas;
          * private List<Idea> currentQuiz;
@@ -82,6 +72,16 @@ public class QuizSetUpController implements QuizSetUpEventHandler {
             view.replace(quizResponseController.getQuizResponse(), "Revision Quiz");
         }else {
             JOptionPane.showMessageDialog(quizSetUpPage, "Can't create empty Quiz. ");
+        }
+    }
+
+    @Override
+    public void chooseTopic(ActionEvent e) {
+        NoteBankView view = controller.getView();
+        QuizSetUpPage quizSetUpPage = controller.getView().quizSetUpPage;
+        Topic selectedItem = quizSetUpPage.getTopicChosen();
+        if(selectedItem!=null) {
+            view.quizSetUpPage.setSliderMinMax(1, selectedItem.getAllIdeas().size());
         }
     }
 }

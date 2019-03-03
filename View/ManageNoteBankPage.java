@@ -344,7 +344,7 @@ public class ManageNoteBankPage extends JPanel {
 	 * Will validate input subject name and will create
 	 * (or not if not valid) the new subject
 	 */
-	public void createNewSubject() {
+	public String createNewSubject() {
 		String priorSubject = this.getSelectedSubject();
 		//subject selected before new subject is created
 		String subjectName = this.getInputSaveName();
@@ -361,9 +361,13 @@ public class ManageNoteBankPage extends JPanel {
 					}
 				}
 			}
+
+			return subjectName;
+
 		}else {
 			JOptionPane.showMessageDialog(this, "You haven't entered a valid subject name");
 		}
+		return null;
 	}
 	
 	/**
@@ -406,7 +410,8 @@ public class ManageNoteBankPage extends JPanel {
 			this.noteModel.removeElement(note);
 		}
 	}
-	
+
+
 	public List<String> getAllSubjects(List<Note>notes){
 		HashSet<String> subjects = new HashSet<String>();
 		for(Note n: notes) {
@@ -416,6 +421,16 @@ public class ManageNoteBankPage extends JPanel {
 		ArrayList<String> subs = new ArrayList<String>();
 		subs.addAll(subjects);
 		return subs;
+	}
+
+	public static List<String> getAllSubjects(HashMap<Note,List<String>>allNotes){
+		HashSet<String> subjects = new HashSet<String>();
+		for(List<String>val: allNotes.values())
+			subjects.addAll(val);
+
+		List<String> list = new ArrayList<>();
+		list.addAll(subjects);
+		return list;
 	}
 	
 	public void addNotes(Note note, List<String>subjects) {
