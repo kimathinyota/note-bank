@@ -254,17 +254,17 @@ public class UploadNotePage extends JPanel {
 		
 			//UPLOAD A FILE LABEL
 		JPanel uploadImageLabelPanel = new JPanel(new GridLayout(3,1));
-		uploadImageLabel = new JLabel("Upload an Model.Image file");
+		uploadImageLabel = new JLabel("Upload an Image file");
 		
 			// Model.Image: [Choose Model.Image] No Model.Image chosen
-		imageLabel = new JLabel("Model.Image:");
+		imageLabel = new JLabel("Image:");
 		imageLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		JPanel chooseImagePanel = new JPanel(new GridLayout(1,1));
-		chooseImage = new JButton("Choose Model.Image");
+		chooseImage = new JButton("Choose Image");
 		chooseImagePanel.add(chooseImage);
 		
-		chosenImageLabel = new JLabel("No Model.Image chosen");
+		chosenImageLabel = new JLabel("No Image chosen");
 		chosenImageLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		

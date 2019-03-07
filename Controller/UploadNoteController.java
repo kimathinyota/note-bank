@@ -2,11 +2,11 @@ package Controller;
 
 import Model.Book;
 import Model.Image;
+import Model.Note;
 import Model.TextExcerpt;
 import View.CreateAnIdeaPage;
 import View.Handlers.UploadNoteEventHandler;
 import View.NoteBankView;
-import View.SelectNotesPage;
 import View.UploadNotePage;
 
 import javax.imageio.ImageIO;
@@ -25,6 +25,7 @@ public class UploadNoteController implements UploadNoteEventHandler {
 
     public UploadNoteController(NoteBankController controller){
         uploadNotePage = new UploadNotePage(this,controller.getPathToDirectory());
+        NoteBankView view = controller.getView();
         this.controller = controller;
     }
 
@@ -54,7 +55,6 @@ public class UploadNoteController implements UploadNoteEventHandler {
 
     @Override
     public void uploadImage(ActionEvent e) {
-
         try {
             NoteBankView view = controller.getView();
             Image imageNote = uploadNotePage.getImage();
@@ -62,18 +62,7 @@ public class UploadNoteController implements UploadNoteEventHandler {
                 controller.addNote(imageNote);
                 uploadNotePage.resetImageNote();
 
-                JPanel prevPage = uploadNotePage.getPreviousPage();
-                if(prevPage instanceof CreateAnIdeaPage) {
-                    ((CreateAnIdeaPage) prevPage).addNote(imageNote);
-                }else if(prevPage instanceof SelectNotesPage) {
-                    ((SelectNotesPage) prevPage).addNote(imageNote);
-                }
-
-                uploadNotePage.nextPanel();
-                view.manageNoteBankPage.refreshNotesListView();
-                view.manageIdeasPage.hideAllTopicsOrIdeasNotAssociatedWithNotes(view.manageNoteBankPage.getNotes(), null );
-                controller.save();
-                controller.updateSubjectFile();
+                uploadNote(imageNote);
 
             }else {
                 JOptionPane.showMessageDialog(uploadNotePage, "Make sure you have chosen a valid note name and have selected a file to add ");
@@ -81,6 +70,20 @@ public class UploadNoteController implements UploadNoteEventHandler {
         } catch (IOException e1) {
 
         }
+    }
+
+    private void uploadNote(Note note){
+        NoteBankView view = controller.getView();
+        JPanel prevPage = uploadNotePage.getPreviousPage();
+        if(prevPage instanceof CreateAnIdeaPage) {
+            ((CreateAnIdeaPage) prevPage).addNote(note);
+        }
+
+        uploadNotePage.nextPanel();
+        view.manageNoteBankPage.refreshNotesListView();
+        view.manageIdeasPage.hideAllTopicsOrIdeasNotAssociatedWithNotes(view.manageNoteBankPage.getNotes(), null );
+        controller.save();
+        controller.updateSubjectFile();
     }
 
     @Override
@@ -91,18 +94,8 @@ public class UploadNoteController implements UploadNoteEventHandler {
             if(text!=null) {
                 controller.addNote(text);
                 uploadNotePage.resetTextNote();
-                uploadNotePage.nextPanel();
 
-                JPanel prevPage = uploadNotePage.getPreviousPage();
-                if(prevPage instanceof CreateAnIdeaPage) {
-                    ((CreateAnIdeaPage) prevPage).addNote(text);
-                }else if(prevPage instanceof SelectNotesPage) {
-                    ((SelectNotesPage) prevPage).addNote(text);
-                }
-                view.manageNoteBankPage.refreshNotesListView();
-                view.manageIdeasPage.hideAllTopicsOrIdeasNotAssociatedWithNotes(view.manageNoteBankPage.getNotes(), null );
-                controller.save();
-                controller.updateSubjectFile();
+                uploadNote(text);
 
             }else {
                 JOptionPane.showMessageDialog(uploadNotePage, "Make sure you have chosen a valid note name");
@@ -121,18 +114,7 @@ public class UploadNoteController implements UploadNoteEventHandler {
                 controller.addNote(pdfNote);
 
                 uploadNotePage.resetPDFNote();
-                JPanel prevPage = uploadNotePage.getPreviousPage();
-                if(prevPage instanceof CreateAnIdeaPage) {
-                    ((CreateAnIdeaPage) prevPage).addNote(pdfNote);
-                }else if(prevPage instanceof SelectNotesPage) {
-                    ((SelectNotesPage) prevPage).addNote(pdfNote);
-                }
-
-                uploadNotePage.nextPanel();
-                view.manageNoteBankPage.refreshNotesListView();
-                view.manageIdeasPage.hideAllTopicsOrIdeasNotAssociatedWithNotes(view.manageNoteBankPage.getNotes(), null );
-                controller.save();
-                controller.updateSubjectFile();
+                uploadNote(pdfNote);
 
             }else {
                 JOptionPane.showMessageDialog(uploadNotePage, "Make sure you have chosen a valid note name and have selected a file to add ");

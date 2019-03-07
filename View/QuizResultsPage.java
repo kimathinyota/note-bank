@@ -11,14 +11,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 
 public class QuizResultsPage extends JPanel {
 	
@@ -116,23 +109,17 @@ public class QuizResultsPage extends JPanel {
 		this.quizResultsTitle = new JLabel("QUIZ RESULTS");
 		quizResultsTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		quizResultsTitle.setHorizontalAlignment(JLabel.CENTER);
-		
+
+
 		Idea[] ideasArray = ideas.toArray(new Idea[ideas.size()]);
-		//Pick Model.Idea -> ComboBox
-		
-		
+
 		this.pickIdea = new JComboBox<Idea>(ideasArray);
-		//pickIdea.setBorder(BorderFactory.createTitledBorder("PICK IDEA"));
 		JScrollPane pickId = new JScrollPane(pickIdea);
 		pickId.setBorder(BorderFactory.createTitledBorder("PICK IDEA"));
 		JPanel resultsPickIdea = new JPanel(new GridLayout(2,1));
 		resultsPickIdea.add(quizResultsTitle);
-		resultsPickIdea.add(pickId);
-		
-		
-		//resultsPickIdea.add(p);
-		
-		//Analysis Section -> Panel
+		resultsPickIdea.add(pickIdea);
+
 		JPanel analysis = new JPanel(new GridLayout(4,1));
 		
 			//Completion Time -> Label
@@ -152,7 +139,7 @@ public class QuizResultsPage extends JPanel {
 		analysis.add(userSatisfaction);
 		analysis.add(readinessLevel);
 		
-		//See Model.Idea -> Button
+		//See Idea -> Button
 		JPanel modifyFinalReadinessFinish = new JPanel(new GridLayout(3,1));
 		this.seeIdea = new JButton("SEE IDEA");
 		
@@ -162,16 +149,28 @@ public class QuizResultsPage extends JPanel {
 		
 		//Finish Quiz -> Label
 		this.finishQuiz = new JButton("FINISH QUIZ");
+
+
+
 		modifyFinalReadinessFinish.add(seeIdea);
-		modifyFinalReadinessFinish.add(finalReadiness);
+		modifyFinalReadinessFinish.add(new JScrollPane(finalReadiness));
 		modifyFinalReadinessFinish.add(finishQuiz);
-		
-		//Layering Quiz Results Page
-		JPanel quizResultsPanel = new JPanel(new BorderLayout());
-		quizResultsPanel.add(resultsPickIdea, BorderLayout.NORTH);
-		quizResultsPanel.add(analysis, BorderLayout.CENTER);
-		quizResultsPanel.add(modifyFinalReadinessFinish, BorderLayout.SOUTH);
-		
+
+		JPanel panel = new JPanel(new GridLayout(2,1));
+		panel.add(analysis);
+
+
+		Box box = Box.createVerticalBox();
+		box.add(resultsPickIdea);
+		box.add(analysis);
+		box.add(modifyFinalReadinessFinish);
+
+
+
+		JPanel quizResultsPanel = new JPanel(new GridLayout(1,1));
+		quizResultsPanel.add(box);
+
+
 		this.setLayout(new GridBagLayout());
 		this.add(quizResultsPanel);
 
@@ -179,7 +178,7 @@ public class QuizResultsPage extends JPanel {
 		this.seeIdea.addActionListener(handler::seeIdea);
 		this.pickIdea.addActionListener(handler::pickIdea);
 		
-		quizResultsPanel.setPreferredSize(new Dimension(350,540));
+		quizResultsPanel.setPreferredSize(new Dimension(400,600));
 		
 
 	}

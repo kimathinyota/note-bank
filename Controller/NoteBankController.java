@@ -2,6 +2,11 @@ package Controller;
 
 import Model.*;
 import View.*;
+import View.RightClickMenus.IdeaRightClick;
+import View.RightClickMenus.NoteRightClick;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,13 +23,24 @@ import javax.swing.JOptionPane;
  * 
  */
 public class NoteBankController {
-	NoteBankView noteBankView;
+	public NoteBankView noteBankView;
+
+	public final long hour = (60*60*1000);
+	public final long day = (hour*24);
+	public final long week = (day*7);
+	public final long fortnight = (week*2);
+	public final long month = (fortnight*2);
+
 	private Topic allTopics;
 	private HashMap<Note,List<String>> allNotes;
 	private String pathToDirectory;
 	private String xmlFileName;
 	private List<Idea> currentQuiz;
 	private int currentIdeaPointer;
+	private IdeaRightClick ideaRightClickMenu;
+	private NoteRightClick noteRightClickMenu;
+	private QuizReader quizReader;
+	private SubjectReader subjectReader;
 
 	public List<Idea> getQuiz(){
 		return currentQuiz;
@@ -67,9 +83,6 @@ public class NoteBankController {
 		return currentQuiz.get(currentIdeaPointer);
 	}
 
-	private QuizReader quizReader;
-	private SubjectReader subjectReader;
-
 	public Date getQuizCreatedTime() {
 		return quizCreatedTime;
 	}
@@ -91,12 +104,6 @@ public class NoteBankController {
 	}
 
 	private double maxWeightedAverageSimulationPerTime;
-
-	long hour = (60*60*1000);
-	long day = (hour*24);
-	long week = (day*7);
-	long fortnight = (week*2);
-	long month = (fortnight*2);
 
 	public NoteBankView getView(){
 		return this.noteBankView;
@@ -156,7 +163,60 @@ public class NoteBankController {
 		this.noteBankView.manageNoteBankPage.addNotes(note, subjects);
 
 	}
-	
+
+	private MouseListener ideaRightClickListener(){
+		MouseListener listener = new MouseListener() {
+					public void popup(MouseEvent e){
+						if(e.isPopupTrigger()){
+							ideaRightClickMenu.show(e.getComponent(), e.getX(), e.getY());
+						}
+					}
+					public void mouseClicked(MouseEvent e) {
+						popup(e);
+					}
+					public void mousePressed(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseReleased(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseEntered(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseExited(MouseEvent e) {
+						popup(e);
+					}
+				};
+		return listener;
+	}
+
+	private MouseListener noteRightClickListener(){
+		MouseListener listener = new MouseListener() {
+					public void popup(MouseEvent e){
+						if(e.isPopupTrigger()){
+							noteRightClickMenu.show(e.getComponent(), e.getX(), e.getY());
+						}
+					}
+					public void mouseClicked(MouseEvent e) {
+						popup(e);
+
+					}
+					public void mousePressed(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseReleased(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseEntered(MouseEvent e) {
+						popup(e);
+					}
+					public void mouseExited(MouseEvent e) {
+						popup(e);
+					}
+				};
+		return listener;
+	}
+
 	public void save() {
 		try {
 			NoteBankController.saveXML(allTopics.toXML(), pathToDirectory, xmlFileName);
@@ -175,11 +235,8 @@ public class NoteBankController {
 	
 	private void updateQuizSetUp() {
 		int numOfIdeas = allTopics.getAllIdeas().size();
-		int minNumOfIdeas = 1;
-		if(numOfIdeas<1) {
-			minNumOfIdeas = 0;
-			numOfIdeas = 0;
-		}
+		numOfIdeas = (numOfIdeas<1 ? 0 : numOfIdeas);
+		int minNumOfIdeas = (numOfIdeas<1 ? 0: 1);
 		noteBankView.quizSetUpPage.setSliderMinMax(minNumOfIdeas, numOfIdeas );
 	}
 
@@ -188,8 +245,6 @@ public class NoteBankController {
 		this.allNotes = new HashMap<Note,List<String> >();
 		this.xmlFileName = "save";
 		String xmlFileLocation = pathToDirectory + this.xmlFileName + ".xml";
-
-
 
 		this.maxWeightedAverageSimulationPerTime = ( 100*1 + 50*3 + 25*10 )/100; 
 		// corresponds to studying: once in last hour, 3 times in last day and 10 times in last week
@@ -213,12 +268,17 @@ public class NoteBankController {
 			e.printStackTrace(); 
 		}
 
-		ManageNoteBankController manageNoteBankController = new ManageNoteBankController(this);
-		ManageIdeasController manageIdeasController = new ManageIdeasController(this);
 		QuizSetUpController quizSetUpController = new QuizSetUpController(this);
 		MainWindowController mainWindowController = new MainWindowController(this);
-		
-		noteBankView = new NoteBankView(allTopics, allNotes, manageNoteBankController, manageIdeasController, quizSetUpController,mainWindowController);
+
+		noteBankView = new NoteBankView(allTopics, allNotes,  quizSetUpController,mainWindowController);
+		RightClickController rightClickController = new RightClickController(this);
+
+		this.ideaRightClickMenu = new IdeaRightClick(rightClickController);
+		this.noteRightClickMenu = new NoteRightClick(rightClickController);
+		noteBankView.addIdeasRightClickListener(this.ideaRightClickListener());
+		noteBankView.addNotesRightClickListener(this.noteRightClickListener());
+
 		int numOfIdeas = allTopics.getAllIdeas().size();
 		numOfIdeas = (numOfIdeas<1 ? 0 : numOfIdeas);
 		int minNumOfIdeas = (numOfIdeas<1 ? 0: 1);

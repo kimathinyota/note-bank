@@ -6,45 +6,49 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public class IdeaMenu extends JMenu {
-    JMenuItem stopFilteringItem;
+    JCheckBoxMenuItem stopFilteringItem;
     JMenuItem combineItem;
     JMenuItem disbandItem;
     JMenuItem moveItem;
-    JMenuItem refreshItem;
 
-    public IdeaMenu(MainWindowEventHandler eventHandler) {
+    public boolean getShouldStopFiltering(){
+        return this.stopFilteringItem.isSelected();
+    }
+
+    public IdeaMenu(MainWindowEventHandler handler) {
         super("Idea");
         //setMnemonic(KeyEvent.VK_H);
 
         combineItem = new JMenuItem("Combine");
+        combineItem.addActionListener(handler::combineNotes);
         //combineItem.setMnemonic(KeyEvent.VK_H);
         combineItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_I, InputEvent.CTRL_MASK));
         add(combineItem);
 
         disbandItem = new JMenuItem("Disband");
+        disbandItem.addActionListener(handler::disbandNotes);
         disbandItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_D, InputEvent.CTRL_MASK));
         //disbandItem.setMnemonic(KeyEvent.VK_H);
         add(disbandItem);
 
         moveItem = new JMenuItem("Move");
+        moveItem.addActionListener(handler::move);
         moveItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_M, InputEvent.CTRL_MASK));
         add(moveItem);
-
-        refreshItem = new JMenuItem("Refresh");
-        //refreshItem.setMnemonic(KeyEvent.VK_H);
-        add(refreshItem);
-
 
         moveItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_R, InputEvent.CTRL_MASK));
 
 
-        stopFilteringItem = new JMenuItem("No Filtering");
+        stopFilteringItem = new JCheckBoxMenuItem("No Filtering");
+        stopFilteringItem.addItemListener(handler::disableSubjectFiltering);
         //stopFilteringItem.setMnemonic(KeyEvent.VK_H);
         add(stopFilteringItem);
+
+        this.setEnabled(false);
 
     }
 
@@ -63,11 +67,6 @@ public class IdeaMenu extends JMenu {
     public void setDisbandEnabled(boolean enabled){
         this.disbandItem.setEnabled(enabled);
     }
-
-    public void setRefreshEnabled(boolean enabled){
-        this.refreshItem.setEnabled(enabled);
-    }
-
 
 
 }

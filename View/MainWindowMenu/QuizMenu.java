@@ -14,7 +14,8 @@ public class QuizMenu extends JMenu {
         JMenuItem createQuizItem = new JMenuItem("Create Quiz");
         createQuizItem.setMnemonic(KeyEvent.VK_H);
         add(createQuizItem);
-        createQuizItem.addActionListener(eventHandler::helpWindow);
+
+        createQuizItem.addActionListener(eventHandler::createQuiz);
     }
 
 }

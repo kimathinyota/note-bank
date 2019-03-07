@@ -1,28 +1,21 @@
 package View;
 
 import Model.Note;
-import View.Handlers.ManageNoteBankPageEventHandler;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -41,26 +34,15 @@ import javax.swing.event.DocumentListener;
  */
 public class ManageNoteBankPage extends JPanel {
 
-	private JButton uploadNote;
-	private JButton removeNotes;
-	private JButton createIdea;
-	private JButton viewNotes;
 	private JTextField noteText;
-	private JButton deleteCurrentSubject;
-	private JButton saveCurrentSubject;
-	private JComboBox<String> subjectList;
 	private JList<Note> listOfNotes;
 	private HashMap<Note, List<String> > allNotes;
 	private DefaultListModel<Note> noteModel;
-	private JTextField subjectName;
-	private DefaultComboBoxModel<String> subjectModel;
 	private HashSet<String> subjects;
-	private List<Note> plusBufferNotes;
-	private JRadioButton moveSelectedNotesToSubject;
 	private String lastSelectedSubject;
 	
 	public void setCurrentSubject(String subject) {
-		this.lastSelectedSubject = subject;
+		lastSelectedSubject = subject;
 	}
 	
 
@@ -79,14 +61,17 @@ public class ManageNoteBankPage extends JPanel {
 			return null;
 		}
 		List<Note> notes = new ArrayList<Note>();
+
 		if(subject.equals("All")) {
 			notes.addAll(allNotes.keySet());
 			return notes;
 		}
 		
 		for(Note n: this.allNotes.keySet()) {
-			if( allNotes.get(n).contains(subject) )
+			if( allNotes.get(n).contains(subject) ) {
 				notes.add(n);
+			}
+
 		}
 		return notes;
 	} 
@@ -107,33 +92,28 @@ public class ManageNoteBankPage extends JPanel {
 	 * This will refresh the notes list
 	 */
 	public void refreshNotesListView() {
-		/*
-		 * Yh below code is pretty sloppy:
-		 *  -> It is supposed to trigger a document listener for note text that will be used to call the 
-		 * displayNotesContainingWords(String word) method to update the list of Notes
-		 *  -> It works but it is shockingly highly coupled code that is in urgent need of a rewrite
-		 */
-		this.noteText.setText("Yooo");
-		this.noteText.setText("");
+		this.displayNotesContainingWords(null);
 	}
-	
+
+
 	/**
 	 *  When user switches to + option in the checkbox, this method needs to be called
 	 *  All of the uploaded notes will also be sent to this buffer
 	 *  If a user decides to create a new subject, all of the notes within this buffer
 	 *  will be assigned to that subject
-	 */
+
 	public void startPlusBuffer() {
 		this.plusBufferNotes = new ArrayList<Note>();
 	}
-	
+	*/
+
 	/**
 	 * Will get all of the notes iwthin the buffer as a List
 	 * @return all notes in plusBuffer
-	 */
+
 	public List<Note> getNotesInBuffer(){
 		return this.plusBufferNotes;
-	}
+	}*/
 	
 	/**
 	 * Used to clear all of the notes from the current list
@@ -145,10 +125,8 @@ public class ManageNoteBankPage extends JPanel {
 	 * Will manage updating all of the necessary objects when a new subject is added
 	 * @param subject
 	 */
-	public void saveSubject(String subject) {
+	private void saveSubject(String subject) {
 		this.subjects.add(subject);
-		this.subjectModel.addElement(subject);
-		this.subjectModel.setSelectedItem(subject);
 	}
 	
 	/**
@@ -156,23 +134,25 @@ public class ManageNoteBankPage extends JPanel {
 	 * You can't delete the + Subject and the All subject
 	 * @param subject
 	 */
-	public void deleteSubject(String subject) {
-		if(!subject.equals("All") && !subject.equals("+")) {
+	public String deleteSubject(String subject) {
+		if(!subject.equals("All") ) {
 			for(List<String> s: this.allNotes.values()) {
 				s.remove(subject);
 			}
-			this.subjectModel.removeElement(subject);
-			this.subjectList.setSelectedItem("All");
+			subjects.remove(subject);
+
+			return subject;
 		}else {
 			JOptionPane.showMessageDialog(this, "You can't delete this subject");
 		}
+		return null;
 	}
 	
 	/**
 	 * Constructor for View.ManageNoteBankPage
 	 * @param noteSubjectMap: stores all mappings from Model.Note to list of subject
 	 */
-	public ManageNoteBankPage(ManageNoteBankPageEventHandler handler, HashMap<Note, List<String>> noteSubjectMap ) {
+	public ManageNoteBankPage(HashMap<Note, List<String>> noteSubjectMap ) {
 		
 		/*
 		 * UPLOAD NOTE
@@ -182,33 +162,19 @@ public class ManageNoteBankPage extends JPanel {
 		 * Buttons
 		 */
 		this.setLayout( new GridBagLayout() );
-		uploadNote = new JButton("UPLOAD NOTE");
-		removeNotes = new JButton("REMOVE NOTES");
-		createIdea = new JButton("CREATE IDEA");
-		viewNotes = new JButton("VIEW NOTES");
 		
-		//Model for managing subject combobox
-		subjectModel = new DefaultComboBoxModel<String>();
-		subjectModel.addElement("All");
-		subjectModel.addElement("+");
+
 		
 		subjects = new HashSet<String>();
 		/*
 		 * Get all subjects and add to subjects HashSet
 		 */
-		for(List<String> subjectList: noteSubjectMap.values()) {
-			for(String subject: subjectList ) {
-				this.subjects.add(subject);
-			}
-		}
-		/*
-		 * Add all subjects to the subject combobox
-		 */
-		for(String subject: this.subjects) {
-			this.subjectModel.addElement(subject);
-		}
-		subjectList = new JComboBox<String>(subjectModel);
-		subjectList.setSelectedItem("All");
+
+
+
+		this.subjects.addAll(ManageNoteBankPage.getAllSubjects(noteSubjectMap));
+
+
 		this.lastSelectedSubject = "All";
 		
 		/*
@@ -225,17 +191,7 @@ public class ManageNoteBankPage extends JPanel {
 		
 		JScrollPane notes = new JScrollPane(listOfNotes);
 		notes.setBorder(BorderFactory.createEmptyBorder());
-		
-		// Move selected notes to subject
-		moveSelectedNotesToSubject = new JRadioButton( "<html><p align=\"center\">"+"MOVE" + "<br>" + "SELECTED" + "<br>" + "TO NEXT"+"<br>" + "SUBJECT" + "</p</html>" );
-		moveSelectedNotesToSubject.setHorizontalAlignment(JLabel.CENTER);
-		
-		JPanel buttonPanel = new JPanel(new GridLayout(5,1));
-		buttonPanel.add(uploadNote);
-		buttonPanel.add(removeNotes);
-		buttonPanel.add(createIdea);
-		buttonPanel.add(viewNotes);
-		buttonPanel.add(moveSelectedNotesToSubject);
+
 		
 		//Search TextField
 		this.noteText = new JTextField();
@@ -245,23 +201,7 @@ public class ManageNoteBankPage extends JPanel {
 		centerPanel.add(notes, BorderLayout.CENTER);
 		
 		allNotes = noteSubjectMap;
-		
-;		//Save and Delete buttons:
-		this.saveCurrentSubject = new JButton("CREATE SUBJECT");
-		this.deleteCurrentSubject = new JButton("DELETE SUBJECT");
-		
-		//Name of subject (will hold the name of the subject created)
-		this.subjectName = new JTextField();
 
-		
-		JPanel subjectCreationPanel = new JPanel(new BorderLayout());
-		JPanel subjectCreateDeleteButtonPanel = new JPanel( new GridLayout(1,2));
-		subjectCreateDeleteButtonPanel.add(this.saveCurrentSubject);
-		subjectCreateDeleteButtonPanel.add(this.deleteCurrentSubject);
-		
-		subjectCreationPanel.add(this.subjectName, BorderLayout.CENTER);
-		subjectCreationPanel.add(subjectCreateDeleteButtonPanel,BorderLayout.EAST);
-		
 		
 		//Layout
 		/*  [       Y - Pick Subject         ]  
@@ -276,15 +216,9 @@ public class ManageNoteBankPage extends JPanel {
 		 */
 		
 		JPanel manageNotePanel = new JPanel(new BorderLayout());
-		manageNotePanel.add(subjectList, BorderLayout.NORTH);
+		//manageNotePanel.add(subjectList, BorderLayout.NORTH);
 		manageNotePanel.add(centerPanel, BorderLayout.CENTER);
-		manageNotePanel.add(buttonPanel, BorderLayout.EAST);
-		manageNotePanel.add(subjectCreationPanel, BorderLayout.SOUTH);
-
-		uploadNote.addActionListener(handler::uploadNote);
-		removeNotes.addActionListener(handler::removeNote);
-		createIdea.addActionListener(handler::createIdea);
-		viewNotes.addActionListener(handler::viewNotes);
+		//manageNotePanel.add(subjectCreationPanel, BorderLayout.SOUTH);
 
 
 		noteText.getDocument().addDocumentListener(
@@ -304,9 +238,7 @@ public class ManageNoteBankPage extends JPanel {
 				}
 		);
 
-		deleteCurrentSubject.addActionListener(handler::deleteSubject);
-		saveCurrentSubject.addActionListener(handler::saveSubject);
-		subjectList.addActionListener(handler::subjectChange);
+		//subjectList.addActionListener(handler::subjectChange);
 		
 		manageNotePanel.setPreferredSize(new Dimension(500,500));
 		this.add(manageNotePanel);
@@ -324,8 +256,8 @@ public class ManageNoteBankPage extends JPanel {
 	public void displayNotesContainingWords(String words){
 		if(!this.getSelectedSubject().equals("+")) {
 			this.noteModel.removeAllElements();
-			for(Note n: this.getNotesOfSubject( this.getSelectedSubject())) {
-				if(n.getName().replaceAll("-"," ").toLowerCase().contains(words.toLowerCase()) ) {
+			for(Note n: this.getNotesOfSubject( lastSelectedSubject)) {
+				if(words==null || n.getName().replaceAll("-"," ").toLowerCase().contains(words.toLowerCase()) ) {
 					this.noteModel.addElement(n);
 				}
 			}
@@ -347,23 +279,15 @@ public class ManageNoteBankPage extends JPanel {
 	public String createNewSubject() {
 		String priorSubject = this.getSelectedSubject();
 		//subject selected before new subject is created
-		String subjectName = this.getInputSaveName();
+
+		String subjectName = JOptionPane.showInputDialog("Enter subject name: ");
+
+		if(subjectName==null)
+			return null;
 
 		if(this.validSubjectName(subjectName)) {
 			this.saveSubject(subjectName);
-			if(priorSubject.equals("+")) {
-				// add all notes from Buffer to the newly created subject 
-				List<Note> ns = new ArrayList<Note>(this.getNotesInBuffer());
-			
-				if(ns!=null) {
-					for(Note n: ns) {
-						this.addNote(n,subjectName);
-					}
-				}
-			}
-
 			return subjectName;
-
 		}else {
 			JOptionPane.showMessageDialog(this, "You haven't entered a valid subject name");
 		}
@@ -380,12 +304,12 @@ public class ManageNoteBankPage extends JPanel {
 		if(selectedSubject==null)
 			selectedSubject = new ArrayList<String>();
 		
-		if(subject.equals("+")) {
-			this.plusBufferNotes.add(note);
-		}else if(!subject.equals("All")) {
+
+		if(!subject.equals("All")) {
 			if(!selectedSubject.contains(subject))
 				selectedSubject.add(getSelectedSubject());
 		}
+
 		allNotes.put(note, selectedSubject);
 		this.noteModel.addElement(note);
 		this.refreshNotesListView();
@@ -401,11 +325,9 @@ public class ManageNoteBankPage extends JPanel {
 			allNotes.remove(note);
 			this.noteModel.removeElement(note); 
 			note.delete();
-		
-			
 		}else {
 			List<String> subjectList = allNotes.get(note);
-			subjectList.remove(this.getSelectedSubject());
+			subjectList.remove(lastSelectedSubject);
 			this.refreshNotesListView();
 			this.noteModel.removeElement(note);
 		}
@@ -441,21 +363,27 @@ public class ManageNoteBankPage extends JPanel {
 		selectedSubject.addAll(subjects);
 		allNotes.put(note, selectedSubject);
 	}
+
+	public void addNotes(String subject, List<Note>notes){
+		for(Note n: notes){
+			this.addNote(n,subject);
+		}
+	}
 	
 	/**
 	 * 
 	 * @return subject name
-	 */
+
 	public String getInputSaveName() {
 		return this.subjectName.getText();
-	}
+	}*/
 	
 	/**
 	 * 
 	 * @return selected subject
 	 */
 	public String getSelectedSubject() {
-		return (String) this.subjectList.getSelectedItem();
+		return (String) this.lastSelectedSubject;
 	}
 	
 	/**
@@ -484,49 +412,9 @@ public class ManageNoteBankPage extends JPanel {
 		return notes;
 		
 	}
-	
-	public boolean shouldMoveSelectedToNextSubject() {
-		return this.moveSelectedNotesToSubject.isSelected();
+
+	public void addRightClickListener(MouseListener listener){
+		this.listOfNotes.addMouseListener(listener);
 	}
-	
-	public void resetMoveSelectedToNextSubject() {
-		this.moveSelectedNotesToSubject.setSelected(false);
-	}
-	
-	/*
-	 *  Methods to allow controller to add required action listeners for each button:
-	 */
-	public void addUploadActionListener(ActionListener uploadActionListener) {
-		this.uploadNote.addActionListener(uploadActionListener);
-	}
-	
-	public void addRemoveNotesActionListener(ActionListener removeNotesActionListener) {
-		this.removeNotes.addActionListener(removeNotesActionListener);
-	}
-	
-	public void addCreateIdeaActionListener(ActionListener createIdeaActionListener ) {
-		this.createIdea.addActionListener(createIdeaActionListener);
-	}
-	
-	public void addViewNotesActionListener(ActionListener viewNotesActionListener) {
-		this.viewNotes.addActionListener(viewNotesActionListener);
-	}
-	
-	public void addSubjectChangeActionListener(ActionListener subjectChangeActionListener) {
-		this.subjectList.addActionListener(subjectChangeActionListener);
-	}
-	
-	public void addDeleteSubjectActionListener(ActionListener deleteSubjectActionListener) {
-		this.deleteCurrentSubject.addActionListener(deleteSubjectActionListener);
-	}
-	
-	public void addSaveSubjectActionListener(ActionListener saveSubjectActionListener) {
-		this.saveCurrentSubject.addActionListener(saveSubjectActionListener);
-	}
-	
-	public void addNoteTextDocumentListener(DocumentListener textDocumentListener) {
-		this.noteText.getDocument().addDocumentListener(textDocumentListener);
-	}
-	
 
 }

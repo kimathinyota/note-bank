@@ -18,6 +18,8 @@ public class SubjectReader {
 	private File csvFile;
 	
 	public String delete(Note note) {
+		if(note==null)
+			return null;
 		String replaceCSV = "";
 		Scanner csvReader;
 		try {
@@ -106,6 +108,8 @@ public class SubjectReader {
 	}
 	
 	public void save(Note a, Collection<String>subjects){
+		if(a==null)
+			return;
 		try {
 			String record = this.delete(a);
 			if(record==null) {

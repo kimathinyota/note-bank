@@ -10,6 +10,7 @@ import javax.swing.*;
  */
 public class MainMenuBar extends JMenuBar {
 
+    private JMenuItem home;
     private FileMenu fileMenu;
 
     private EditMenu editMenu;
@@ -21,6 +22,11 @@ public class MainMenuBar extends JMenuBar {
     private ViewMenu viewMenu;
 
     private HelpMenu helpMenu;
+    JCheckBoxMenuItem moveSubject;
+
+    public JCheckBoxMenuItem getMoveSubject() {
+        return moveSubject;
+    }
 
     public FileMenu getFileMenu() {
         return fileMenu;
@@ -49,6 +55,13 @@ public class MainMenuBar extends JMenuBar {
 
     public MainMenuBar(MainWindowEventHandler eventHandler, List<String>subjects){
 
+
+        JMenu homeMenu = new JMenu("NoteBank");
+        home = new JMenuItem("Home");
+        home.addActionListener(eventHandler::switchToNotesBank);
+        homeMenu.add(home);
+        add(homeMenu);
+
         fileMenu = new FileMenu(eventHandler);
         add(fileMenu);
         editMenu = new EditMenu(eventHandler);
@@ -59,6 +72,13 @@ public class MainMenuBar extends JMenuBar {
         add(quizMenu);
         viewMenu = new ViewMenu(eventHandler,subjects);
         add(viewMenu);
+
+        JMenu settingMenu = new JMenu("Settings");
+        moveSubject = new JCheckBoxMenuItem("Move selected notes to next subject");
+        moveSubject.setSelected(true);
+        settingMenu.add(moveSubject);
+        add(settingMenu);
+
         helpMenu = new HelpMenu(eventHandler);
         add(helpMenu);
 

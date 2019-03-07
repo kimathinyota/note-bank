@@ -50,14 +50,14 @@ public class QuizResultsController implements QuizResultsEventHandler {
     @Override
     public void finishQuiz(ActionEvent e) {
         NoteBankView view = controller.getView();
-        view.replace(view.quizSetUpPage, "Revision Quiz" );
+        view.setFixedPage(view.manageNoteBankPage, "Manage Note Bank");
     }
 
     @Override
     public void seeIdea(ActionEvent e) {
         NoteBankView view = controller.getView();
         Idea idea = resultsPage.getSelectedIdea();
-        CreateAnIdeaController createAnIdeaController = new CreateAnIdeaController(controller,idea);
+        CreateAnIdeaController createAnIdeaController = new CreateAnIdeaController(controller,idea, view.manageNoteBankPage.getNotes());
         CreateAnIdeaPage createAnIdeaPage = createAnIdeaController.getCreateAnIdeaPage();
         createAnIdeaPage.changeTitle("Edit Idea");
         createAnIdeaPage.setPreviousPage(resultsPage);

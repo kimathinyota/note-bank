@@ -28,7 +28,8 @@ public class QuizResponseController implements QuizResponseEventHandler {
     @Override
     public void quit(ActionEvent e) {
         NoteBankView view = controller.getView();
-        view.replace(view.quizSetUpPage, "Revision Quiz" );
+        view.setFixedPage(view.manageNoteBankPage,"Manage Note Bank Page");
+
     }
 
     @Override

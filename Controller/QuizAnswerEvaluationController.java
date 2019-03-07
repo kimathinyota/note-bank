@@ -17,7 +17,6 @@ public class QuizAnswerEvaluationController implements QuizAnswerEvaluationEvent
     private QuizAnswerEvaluationPage quizAnswerEvaluationPage;
     private NoteBankController controller;
 
-
     public QuizAnswerEvaluationPage getQuizAnswerEvaluationPage() {
         return quizAnswerEvaluationPage;
     }
@@ -30,7 +29,7 @@ public class QuizAnswerEvaluationController implements QuizAnswerEvaluationEvent
     @Override
     public void quit(ActionEvent e) {
         NoteBankView view = controller.getView();
-        view.replace(view.quizSetUpPage, "Revision Quiz" );
+        view.replace(view.manageNoteBankPage, "Revision Quiz" );
     }
 
     @Override

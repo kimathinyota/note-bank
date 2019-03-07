@@ -20,26 +20,25 @@ public class CreateAnIdeaController implements CreateAnIdeaEventHandler {
         return createAnIdeaPage;
     }
 
-    public CreateAnIdeaController(NoteBankController controller, List<Note>notes, List<String> keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote) {
-        createAnIdeaPage = new CreateAnIdeaPage(this,notes,keyWords, promptInp, isPromptKeyWord, finalNote);
+    public CreateAnIdeaController(NoteBankController controller, List<Note>notes, List<String> keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote, List<Note>allNotes) {
+        createAnIdeaPage = new CreateAnIdeaPage(this,notes,keyWords, promptInp, isPromptKeyWord, finalNote, allNotes);
         this.controller = controller;
     }
 
-    public CreateAnIdeaController(NoteBankController controller, Idea idea) {
-        createAnIdeaPage = new CreateAnIdeaPage(this,idea);
+    public CreateAnIdeaController(NoteBankController controller, Idea idea, List<Note>allNotes) {
+        createAnIdeaPage = new CreateAnIdeaPage(this,idea, allNotes);
         this.controller = controller;
     }
 
-    public CreateAnIdeaController(NoteBankController controller, HashMap<Note,Integer> notes, List<String> keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote) {
-        createAnIdeaPage = new CreateAnIdeaPage(this,notes,keyWords, promptInp, isPromptKeyWord, finalNote);
+    public CreateAnIdeaController(NoteBankController controller, HashMap<Note,Integer> notes, List<String> keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote, List<Note>allNotes) {
+        createAnIdeaPage = new CreateAnIdeaPage(this,notes,keyWords, promptInp, isPromptKeyWord, finalNote, allNotes);
         this.controller = controller;
     }
 
-    public CreateAnIdeaController(NoteBankController controller) {
-        createAnIdeaPage = new CreateAnIdeaPage(this);
+    public CreateAnIdeaController(NoteBankController controller,List<Note>allNotes) {
+        createAnIdeaPage = new CreateAnIdeaPage(this,allNotes);
         this.controller = controller;
     }
-
 
     @Override
     public void back(ActionEvent e) {
@@ -47,15 +46,6 @@ public class CreateAnIdeaController implements CreateAnIdeaEventHandler {
         view.deletePage(createAnIdeaPage);
         view.restorePages();
         view.switchPage(createAnIdeaPage.getPreviousPage());
-    }
-
-    @Override
-    public void addNote(ActionEvent e) {
-        NoteBankView view = controller.getView();
-        SelectNotePageController selectNotePageController = new SelectNotePageController(controller,view.manageNoteBankPage.getNotes());
-        SelectNotesPage selectNotesPage = selectNotePageController.getSelectNotePage();
-        selectNotesPage.setPreviousPage(createAnIdeaPage);
-        view.addFixedPage(selectNotesPage, "Select notes to add to Idea");
     }
 
     @Override
@@ -89,27 +79,21 @@ public class CreateAnIdeaController implements CreateAnIdeaEventHandler {
         NoteBankView view = controller.getView();
         if(createAnIdeaPage.getPromptText().length()>3) {
             Idea createdIdea = createAnIdeaPage.getIdea();
+            view.manageNoteBankPage.addNotes(view.manageNoteBankPage.getCurrentSubject(),createdIdea.getNotes());
 
-            if(createAnIdeaPage.getPreviousPage() instanceof ManageNoteBankPage){
+            if(!createAnIdeaPage.isEdited())
                 view.manageIdeasPage.addToRoot(createdIdea);
-            }
 
             if(createAnIdeaPage.getPreviousPage() instanceof ViewNotesPage) {
-                view.manageIdeasPage.addToRoot(createdIdea);
-                view.deletePage(createAnIdeaPage);
-                view.restorePages();
-                view.deletePage(createAnIdeaPage.getPreviousPage());
-                view.restorePages();
-                view.switchPage( ((ViewNotesPage) createAnIdeaPage.getPreviousPage() ).getPreviousPage() );
-
+                view.backToPreviousPage(createAnIdeaPage,createAnIdeaPage.getPreviousPage());
+                view.backToPreviousPage(createAnIdeaPage.getPreviousPage(),
+                        ((ViewNotesPage) createAnIdeaPage.getPreviousPage()).getPreviousPage());
             }else {
-                //Assumes it is being edited
-                view.deletePage(createAnIdeaPage);
-                view.restorePages();
-                view.switchPage(createAnIdeaPage.getPreviousPage());
+                view.backToPreviousPage(createAnIdeaPage,createAnIdeaPage.getPreviousPage());
             }
             view.manageIdeasPage.refresh();
             controller.save();
+            controller.updateSubjectFile();
 
         }else {
             JOptionPane.showMessageDialog(createAnIdeaPage, "Invalid prompt entered");
@@ -119,6 +103,11 @@ public class CreateAnIdeaController implements CreateAnIdeaEventHandler {
     @Override
     public void viewAllNotes(ActionEvent e) {
         NoteBankView view = controller.getView();
+        if(createAnIdeaPage.getNotes().size()<1){
+            JOptionPane.showMessageDialog(view,"No notes selected");
+            return;
+        }
+
         ViewNotesController viewNotesController = new ViewNotesController(controller,createAnIdeaPage.getNotes(),false);
         ViewNotesPage viewNotesPage = viewNotesController.getViewNotes();
         viewNotesPage.setPreviousPage(createAnIdeaPage);

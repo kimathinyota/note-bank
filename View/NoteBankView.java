@@ -1,13 +1,8 @@
 package View;
 
-import Controller.ManageIdeasController;
-import Controller.ManageNoteBankController;
-import Controller.QuizSetUpController;
+import Controller.MainWindowController;
 import Model.Note;
 import Model.Topic;
-import View.Handlers.MainWindowEventHandler;
-import View.Handlers.ManageIdeasEventHandler;
-import View.Handlers.ManageNoteBankPageEventHandler;
 import View.Handlers.QuizSetUpEventHandler;
 import View.MainWindowMenu.MainMenuBar;
 
@@ -15,6 +10,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.MouseListener;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -29,7 +25,17 @@ public class NoteBankView extends JFrame{
 
 	public MainMenuBar getMenus(){
 		return this.menuBar;
+	}
 
+	public boolean containtsPage(Component page){
+		return navigationPane.indexOfComponent(page)>-1;
+	}
+
+	public Component getPage(){
+		for(int i=0; i<navigationPane.getTabCount(); i++){
+			return navigationPane.getComponentAt(i);
+		}
+		return null;
 	}
 
 	private Stack<Map<JPanel, String>> deletedPagesStack;
@@ -51,10 +57,11 @@ public class NoteBankView extends JFrame{
 	public void switchPage(Component page) {
 		this.navigationPane.setSelectedComponent(page);
 	}
-	
-	
-	
-	
+
+	public void setFixedPage(Component page,String title) {
+		navigationPane.removeAll();
+		this.navigationPane.add(title, page);
+	}
 
 	public void restorePages() {
 		Map<JPanel, String> deletedPages = this.deletedPagesStack.pop();
@@ -82,6 +89,13 @@ public class NoteBankView extends JFrame{
 			}
 		}
 	}
+
+	public void backToPreviousPage(JPanel currentPage, JPanel previousPage){
+		this.restorePages();
+		this.deletePage(currentPage);
+		if(this.containtsPage(previousPage))
+			this.switchPage(previousPage);
+	}
 	
 	public void add(JPanel page, String title) {
 		this.navigationPane.add(title, page);
@@ -100,13 +114,19 @@ public class NoteBankView extends JFrame{
 		if(switchPage!=null)
 			navigationPane.setSelectedComponent(switchPage);	
 	}
-	
 
-	
+	public void addNotesRightClickListener(MouseListener listener){
+		this.manageNoteBankPage.addRightClickListener(listener);
+	}
 
-		
-	public NoteBankView(Topic allTopics, HashMap<Note,List<String>>allNotes, ManageNoteBankPageEventHandler manageNoteBankController,
-						ManageIdeasEventHandler manageIdeasController, QuizSetUpEventHandler quizSetUpController, MainWindowEventHandler mainHandler) {
+	public void addIdeasRightClickListener(MouseListener listener){
+		this.manageIdeasPage.addRightClickListener(listener);
+	}
+
+
+
+	public NoteBankView(Topic allTopics, HashMap<Note,List<String>>allNotes,
+						 QuizSetUpEventHandler quizSetUpController, MainWindowController mainWindowController) {
 
 
 		try {
@@ -123,23 +143,25 @@ public class NoteBankView extends JFrame{
 		
 		deletedPagesStack = new Stack<Map<JPanel, String>>();
 		
-		manageNoteBankPage = new ManageNoteBankPage(manageNoteBankController,allNotes);
-		manageIdeasPage = new ManageIdeasPage(manageIdeasController,allTopics);
+		manageNoteBankPage = new ManageNoteBankPage(allNotes);
+		manageIdeasPage = new ManageIdeasPage(allTopics);
 		quizSetUpPage = new QuizSetUpPage(quizSetUpController);
-		
+
+
 		
 		navigationPane.addTab("Manage Note Bank", manageNoteBankPage);
-		navigationPane.addTab("Manage Ideas", manageIdeasPage);
-		navigationPane.addTab("Revision Quiz", quizSetUpPage);
+		//navigationPane.addTab("Manage Ideas", manageIdeasPage);
+		//navigationPane.addTab("Revision Quiz", quizSetUpPage);
 
 		navigationPane.setSelectedIndex(0);
 
 
-
-		menuBar = new MainMenuBar(mainHandler,ManageNoteBankPage.getAllSubjects(allNotes));
-
+		this.menuBar = new MainMenuBar(mainWindowController,ManageNoteBankPage.getAllSubjects(allNotes));
 		this.setJMenuBar(menuBar);
-		
+
+		navigationPane.addChangeListener(mainWindowController::pageChanged);
+
+
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout( new GridLayout(1,1) );
 		mainPanel.add(navigationPane);

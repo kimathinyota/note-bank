@@ -14,7 +14,13 @@ class FileMenu extends JMenu {
     JMenuItem importItem;
     JMenuItem exportItem;
     JMenuItem quitItem;
-    JMenu newMenu;
+    NewMenu newMenu;
+
+
+
+    public JMenu getNewMenu() {
+        return newMenu;
+    }
 
     public FileMenu(MainWindowEventHandler eventHandler){
         super("File");

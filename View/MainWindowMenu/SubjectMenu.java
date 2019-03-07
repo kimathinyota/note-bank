@@ -11,17 +11,27 @@ public class SubjectMenu extends JMenu {
 
     HashMap<String,JRadioButtonMenuItem> subjects;
     ButtonGroup buttons;
+    MainWindowEventHandler handler;
 
 
-    public void removeSubject(MainWindowEventHandler handler,String subject){
+    public void selectSubject(String subject){
+        ButtonModel model = subjects.get(subject).getModel();
+        buttons.clearSelection();
+        buttons.setSelected(model,true);
+    }
+
+
+    public void removeSubject(String subject){
         JRadioButtonMenuItem item = subjects.remove(subject);
         this.remove(item);
         buttons.remove(item);
+        subjects.remove(subject);
     }
 
     public void addSubject(String subject){
         JRadioButtonMenuItem item = new JRadioButtonMenuItem(subject);
-        super.add( item );
+        item.addItemListener(handler::subjectSelected );
+        add(item);
         buttons.add(item);
         subjects.put(subject,item);
     }
@@ -32,14 +42,24 @@ public class SubjectMenu extends JMenu {
         return subjects;
     }
 
+
     public SubjectMenu(MainWindowEventHandler handler,List<String>subjects){
         super("Subjects");
+        this.handler = handler;
         this.subjects = new HashMap<String,JRadioButtonMenuItem>();
         buttons = new ButtonGroup();
-        this.addSubject("All");
+
+        JRadioButtonMenuItem item = new JRadioButtonMenuItem("All");
+        item.setSelected(true);
+        item.addItemListener(handler::subjectSelected );
+        this.subjects.put("All",item);
+        add(item);
+        buttons.add(item);
+
         for(String subject: subjects){
             this.addSubject(subject);
         }
+
     }
 
 }

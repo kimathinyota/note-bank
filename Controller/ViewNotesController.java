@@ -9,7 +9,6 @@ import java.util.List;
 import View.CreateAnIdeaPage;
 import View.Handlers.ViewNotesEventHandler;
 import View.NoteBankView;
-import View.SelectNotesPage;
 import View.ViewNotesPage;
 
 import javax.swing.*;
@@ -18,18 +17,14 @@ public class ViewNotesController implements ViewNotesEventHandler {
     private ViewNotesPage viewNotesPage;
     private NoteBankController controller;
 
-
     public ViewNotesPage getViewNotes(){
         return this.viewNotesPage;
     }
 
-    public ViewNotesController(NoteBankController controller, List<Note>selectedNotes,
-                                    boolean enableCreateIdeaFunctionality){
+    public ViewNotesController(NoteBankController controller, List<Note>selectedNotes, boolean enableCreateIdeaFunctionality){
         this.controller = controller;
-        viewNotesPage = new ViewNotesPage(this,enableCreateIdeaFunctionality,selectedNotes,controller.getPathToDirectory());
-
-
-
+        if(selectedNotes.size()>0)
+            viewNotesPage = new ViewNotesPage(this,enableCreateIdeaFunctionality,selectedNotes,controller.getPathToDirectory());
     }
 
     @Override
@@ -45,26 +40,10 @@ public class ViewNotesController implements ViewNotesEventHandler {
     @Override
     public void createIdea(ActionEvent e) {
         NoteBankView view = controller.getView();
-        JPanel prevPage = viewNotesPage.getPreviousPage();
-        if( prevPage instanceof SelectNotesPage) {
-            JPanel prevPrevPage = ( (SelectNotesPage) prevPage ).getPreviousPage();
-            if(prevPrevPage instanceof CreateAnIdeaPage) {
-                CreateAnIdeaPage createIdeaPage = (CreateAnIdeaPage) prevPrevPage;
-                for(Note n: viewNotesPage.getSelectedNotes()) {
-                    createIdeaPage.addNote(n);
-                }
-            }
-            view.deletePage(viewNotesPage);
-            view.restorePages();
-            view.deletePage(prevPage);
-            view.restorePages();
-            view.switchPage(prevPrevPage);
-        }else {
-            CreateAnIdeaController createAnIdeaController = new CreateAnIdeaController(controller,viewNotesPage.getSelectedNotes(),null,null,null, null);
-            CreateAnIdeaPage createAnIdea = createAnIdeaController.getCreateAnIdeaPage();
-            createAnIdea.setPreviousPage(viewNotesPage);
-            view.addFixedPage(createAnIdea, "Create Idea");
-        }
+        CreateAnIdeaController createAnIdeaController = new CreateAnIdeaController(controller,viewNotesPage.getSelectedNotes(),null,null,null, null,view.manageNoteBankPage.getNotes());
+        CreateAnIdeaPage createAnIdea = createAnIdeaController.getCreateAnIdeaPage();
+        createAnIdea.setPreviousPage(viewNotesPage);
+        view.addFixedPage(createAnIdea, "Create Idea");
     }
 
     @Override

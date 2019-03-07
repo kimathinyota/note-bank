@@ -102,7 +102,7 @@ public class QuizResponsePage extends JPanel {
 		
 		this.setLayout(new GridBagLayout());
 		this.add(quizResponsePanel);
-		quizResponsePanel.setPreferredSize(new Dimension(450,600));
+		quizResponsePanel.setPreferredSize(new Dimension(400,600));
 
 	}
 	

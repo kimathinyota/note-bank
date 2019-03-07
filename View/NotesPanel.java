@@ -6,6 +6,8 @@ import Model.Note;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,12 +27,14 @@ public class NotesPanel extends JPanel {
 	private JList<Note> listOfNonPromptNotes;
 	private DefaultListModel<Note> nonPromptNoteModel;
 	private JTabbedPane notesPane;
-	private JButton move;
+	private JButton remove;
 	
 	public void addNote(Note n, boolean isPrompt) {
 		if(isPrompt) {
-			if(!this.promptNoteModel.contains(n))
+			if(!this.promptNoteModel.contains(n)) {
 				this.promptNoteModel.addElement(n);
+				this.notesPane.setSelectedIndex(0);
+			}
 			return;
 		}
 		this.addNote(n);
@@ -38,12 +42,14 @@ public class NotesPanel extends JPanel {
 	public void addNote(Note n) {
 		if(!this.nonPromptNoteModel.contains(n))
 			this.nonPromptNoteModel.addElement(n);
+		this.notesPane.setSelectedIndex(1);
 	}
 	
 	public void addNote(Collection<Note>notes) {
 		for(Note n: notes) {
-			this.nonPromptNoteModel.addElement(n);
+			this.addNote(n);
 		}
+		this.notesPane.setSelectedIndex(1);
 	}
 	
 	public void clear() {
@@ -92,45 +98,14 @@ public class NotesPanel extends JPanel {
 		return notes;
 		
 	}
-	
-	private void moveNotes(List<Note>notes, boolean toPrompt ) {
-		for(Note n: notes) {
-			if(toPrompt) {
-				this.nonPromptNoteModel.removeElement(n);
-				this.promptNoteModel.addElement(n);
-			}else {
-				this.promptNoteModel.removeElement(n);
-				this.nonPromptNoteModel.addElement(n);
-			}	
-		}
-		int index = (toPrompt ? 0 : 1 );
-		notesPane.setSelectedIndex( index   );
-		
-	}
+
 	
 	public List<Note> getSelectedNotes(){
 		JScrollPane fromPane = (JScrollPane) notesPane.getSelectedComponent();
 		JList<Note> fromList = (JList<Note>) fromPane.getViewport().getView();
 		return fromList.getSelectedValuesList();
 	}
-	
-	
-	public ActionListener moveActionListener() {
-		return new ActionListener() {
 
-			public void actionPerformed(ActionEvent e) {
-
-				List<Note> selectedNotes = getSelectedNotes();
-				
-				JScrollPane toPane = (JScrollPane) notesPane.getComponentAt( (notesPane.getSelectedIndex()+1)%notesPane.getTabCount() );
-				JList<Note> move = (JList<Note>) toPane.getViewport().getView();
-				
-				moveNotes(selectedNotes,listOfPromptNotes==move);
-				
-			}
-			
-		};
-	}
 	
 	private void setUpPage() {
 		this.promptNoteModel = new DefaultListModel<Note>();
@@ -140,16 +115,95 @@ public class NotesPanel extends JPanel {
 		this.notesPane = new JTabbedPane();
 		this.notesPane.addTab("Prompt Notes", new JScrollPane(this.listOfPromptNotes));
 		this.notesPane.addTab("Non Prompt Notes", new JScrollPane(this.listOfNonPromptNotes));
-		this.move = new JButton("MOVE SELECTED NOTES");
-		this.move.addActionListener( this.moveActionListener() );
-		
+		this.remove = new JButton("REMOVE");
+		this.remove.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for(Note n: getSelectedNotes()){
+					removeNote(n);
+				}
+			}
+		});
+
+		this.listOfNonPromptNotes.addMouseListener(
+				new MouseListener() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if(e.getClickCount()==2){
+							for (Note n: listOfNonPromptNotes.getSelectedValuesList()){
+								promptNoteModel.addElement(n);
+								nonPromptNoteModel.removeElement(n);
+								notesPane.setSelectedIndex(0);
+							}
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+
+					}
+				}
+		);
+
+		this.listOfPromptNotes.addMouseListener(
+				new MouseListener() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if(e.getClickCount()==2){
+							for (Note n: listOfPromptNotes.getSelectedValuesList()){
+								promptNoteModel.removeElement(n);
+								nonPromptNoteModel.addElement(n);
+								notesPane.setSelectedIndex(1);
+							}
+						}
+					}
+
+					@Override
+					public void mousePressed(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent e) {
+
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+
+					}
+				}
+		);
+
+
 		this.setLayout(new BorderLayout());
 		this.add(this.notesPane, BorderLayout.CENTER);
-		this.add(move, BorderLayout.SOUTH);
+		this.add(remove, BorderLayout.SOUTH);
 	}
 	
 	public NotesPanel(Map<Note,Integer> notes) {
 		this.setUpPage();
+		this.notesPane.setSelectedIndex(0);
 		if(notes!=null) {
 			for(Note n: notes.keySet()) {
 			this.addNote(n, notes.get(n).intValue()==Idea.PROMPT_NOTE);

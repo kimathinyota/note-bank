@@ -3,24 +3,21 @@ package View;
 import Model.Idea;
 import Model.Note;
 import Model.Topic;
-import View.Handlers.ManageIdeasEventHandler;
+
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -38,47 +35,24 @@ import javax.swing.tree.TreeSelectionModel;
  * @author kimathi nyota
  */
 public class ManageIdeasPage extends JPanel {
-	
-	private JButton combine;
-	private JButton disband;
-	private JButton edit;
-	private JButton delete;
+
 	private JTree ideaTree;
 	private DefaultMutableTreeNode rootNode;
 	private Topic root;
-	private JButton move;
-	private JButton viewAllTopic;
 	
 	public void refresh() {
 		DefaultTreeModel model = (DefaultTreeModel) this.ideaTree.getModel();
 		model.reload();	
 	}
+
+
 	
-	private void setUpPage(ManageIdeasEventHandler handler, Topic root) {
+	private void setUpPage(Topic root) {
 		this.root = root;
 		// COMBINE and DISBAND buttons
-		combine = new JButton("COMBINE");
-		disband = new JButton("DISBAND");
-		move = new JButton("MOVE");
-		viewAllTopic = new JButton("SEE ALL");
-		
-		JPanel combineDisbandPanel = new JPanel(new GridLayout(1,4));
-		combineDisbandPanel.add(combine);
-		combineDisbandPanel.add(move);
-		combineDisbandPanel.add(viewAllTopic);
-		combineDisbandPanel.add(disband);
-	
-		
-		//EDIT and DELETE buttons
-		edit = new JButton("EDIT"); 
-		delete = new JButton("DELETE");
-		
-		
-		JPanel editDeletePanel = new JPanel(new GridLayout(1,2));
-		editDeletePanel.add(edit);
-		editDeletePanel.add(delete);
+
 		JPanel manageIdeasPanel = new JPanel(new BorderLayout());
-	
+
 		DefaultMutableTreeNode[] rootPassByReference= new DefaultMutableTreeNode[1];
 			
 		this.buildIdeaTree(this.root, null, rootPassByReference);
@@ -88,34 +62,8 @@ public class ManageIdeasPage extends JPanel {
 		
 		JScrollPane idea = new JScrollPane(ideaTree);
 		idea.setBorder(BorderFactory.createEmptyBorder());
-		
-		manageIdeasPanel.add(combineDisbandPanel, BorderLayout.NORTH);
 		manageIdeasPanel.add(idea, BorderLayout.CENTER);
-		manageIdeasPanel.add(editDeletePanel,BorderLayout.SOUTH);
 		manageIdeasPanel.setPreferredSize(new Dimension(500,500));
-		
-		/* Layout:          
-		 *  --------------------------------
-		 * |        MANAGE IDEAS            |
-		 *  --------------------------------
-		 * [    COMBINE    ][    DISBAND    ]
-		 *  --------------------------------
-		 * | [*] Root                       |
-		 * |    [*] Model.Idea ..                 |
-		 * |    [*] Model.Topic ..                |
-		 * |        [*] Model.Idea ...            |
-		 * |         ...                    |
-		 * |     ...                        |
-		 * | -------------------------------|
-		 * [      EDIT     ][    DELETE     ]  
-		 */
-
-		this.combine.addActionListener(handler::combine);
-		this.delete.addActionListener(handler::delete);
-		this.disband.addActionListener(handler::disband);
-		this.edit.addActionListener(handler::edit);
-		this.move.addActionListener(handler::move);
-		this.viewAllTopic.addActionListener(handler::viewAllIdeas);
 		
 		this.add(manageIdeasPanel);
 		this.setLayout( new GridBagLayout() );
@@ -127,8 +75,8 @@ public class ManageIdeasPage extends JPanel {
 	 * 	It builds the Tree from the input root Model.Topic
 	 * @param root - a Model.Topic object used to buld the tree from, typically an allTopic object
 	 */
-	public ManageIdeasPage(ManageIdeasEventHandler handler,Topic root) {
-		this.setUpPage(handler,root);
+	public ManageIdeasPage(Topic root) {
+		this.setUpPage(root);
 	}
 	
 	/**
@@ -341,7 +289,7 @@ public class ManageIdeasPage extends JPanel {
 		
 		if(canCombine(ideaTopic) ) {
 			// Get topic name as input from user
-			String topicName = JOptionPane.showInputDialog("Enter Model.Topic: ");
+			String topicName = JOptionPane.showInputDialog("Enter Topic: ");
 			if(topicName!=null) {
 				//Create new Model.Topic (name=topic name)
 				Topic generalTopic = new Topic(topicName);
@@ -472,34 +420,11 @@ public class ManageIdeasPage extends JPanel {
 		}
 		return null;
 	}
-	
-	/*
-	 * Listeners for each button, and the Tree
-	 */
-	
-	public void addCombineActionListener(ActionListener combineActionListener) {
-		this.combine.addActionListener(combineActionListener);
-	}
-	
-	public void addDisbandActionListener(ActionListener disbandActionListener) {
-		this.disband.addActionListener(disbandActionListener);
-	}
-	
-	public void addEditActionListener(ActionListener editActionListener) {
-		this.edit.addActionListener(editActionListener);
-	}
-	
-	public void addDeleteActionListener(ActionListener deleteActionListener) {
-		this.delete.addActionListener(deleteActionListener);
+
+
+	public void addRightClickListener(MouseListener listener){
+		this.ideaTree.addMouseListener(listener);
 	}
 
-	
-	public void addMoveActionListener(ActionListener moveActionListener) {
-		this.move.addActionListener(moveActionListener);
-	}
-	
-	public void addViewAllIdeasActionListener(ActionListener viewAllIdeasActionListener) {
-		this.viewAllTopic.addActionListener(viewAllIdeasActionListener);
-	}
 
 }

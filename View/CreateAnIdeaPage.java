@@ -3,6 +3,7 @@ package View;
 import Model.Idea;
 import Model.Note;
 import View.Handlers.CreateAnIdeaEventHandler;
+import com.sun.tools.corba.se.idl.constExpr.Not;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,6 +11,8 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,20 +52,32 @@ public class CreateAnIdeaPage extends JPanel {
 	private JRadioButton keyWord;
 	private JRadioButton question;
 	private ButtonGroup keyWordQuestionButtonGroup;
-	private JButton addNote;
+
 	private JButton removeNotes;
 	private JButton selectFinalNote;
+	private JButton deselectFinalNote;
+
 	private NotesPanel notesPanel;
-	private DefaultListModel<Note> finalNoteModel;
+
 	private JList<String> listOfKeyWords;
+	private SearchList allNotes;
+	private DefaultListModel<Note> allNotesList;
 	private DefaultListModel<String> keyWordModel;
-	private JList<Note> finalNote;
 	private JButton addKeyWord;
 	private JButton removeKeyWord;
+
 	private JButton saveIdea;
+
 	private JPanel previousPage;
 	private Idea editIdea;
 	private JButton viewAllNotes;
+
+	private JLabel chosenSelectedFinalNote;
+	private Note finalNote;
+
+	public boolean isEdited(){
+		return editIdea!=null;
+	}
 	
 	/**
 	 * Getter for previous page
@@ -108,7 +123,8 @@ public class CreateAnIdeaPage extends JPanel {
 	 * @param isPromptKeyWord - used to set selected Key word or Question checkboxe
 	 * @param finalNote - used to initialise member JList: finalNote
 	 */
-	private void setUpPage(CreateAnIdeaEventHandler handler,HashMap<Note,Integer>notes, List<String>keyWords, String promptInp,Boolean isPromptKeyWord, Note finalNote) {
+	private void setUpPage(CreateAnIdeaEventHandler handler,HashMap<Note,Integer>notes, List<String>keyWords, String promptInp,
+						   Boolean isPromptKeyWord, Note finalNote, List<Note>allNotesList) {
 		this.setListOfNotes(notes);
 		this.setListOfKeyWords(keyWords);
 		
@@ -163,7 +179,7 @@ public class CreateAnIdeaPage extends JPanel {
 
 		JPanel createIdeaNorthSection = new JPanel(new GridLayout(4,1));
 		createIdeaNorthSection.add(backPanel);
-		createIdeaNorthSection.add(createIdeaTitle);
+		//createIdeaNorthSection.add(createIdeaTitle);
 		createIdeaNorthSection.add(promptPane);
 		createIdeaNorthSection.add(keyWordQuestionPanel);
 
@@ -172,12 +188,9 @@ public class CreateAnIdeaPage extends JPanel {
 		 *   [ ADD NOTE ]
 		 *  [ REMOVE NOTE ]
 		 */
-		addNote = new JButton("ADD NOTE");
+
 		removeNotes = new JButton("REMOVE NOTES");
-		
-		this.finalNoteModel = new DefaultListModel<Note>();
-		if(finalNote!=null)
-			finalNoteModel.addElement(finalNote);
+
 		
 		/*
 		 *  [SELECT FINAL NOTE]  - Button
@@ -185,36 +198,42 @@ public class CreateAnIdeaPage extends JPanel {
 		 */
 		
 		
-		this.finalNote = new JList<Note>(finalNoteModel);
-		JScrollPane finalNotePane = new JScrollPane(this.finalNote);
-		finalNotePane.setPreferredSize( new Dimension(30,50) );
-		
-		selectFinalNote = new JButton("SELECT FINAL NOTE");
 
-		JPanel finalNotePanel = new JPanel( new GridLayout(2,1) );
-		finalNotePanel.add(selectFinalNote);
-		finalNotePanel.add(finalNotePane);
-		
-		JPanel buttonPanel = new JPanel(new GridLayout(3,1));
-		buttonPanel.add(addNote);
-		buttonPanel.add(removeNotes);
-		
-		
-		buttonPanel.add(finalNotePanel);
-		
-		
+		selectFinalNote = new JButton("SELECT");
+
+		chosenSelectedFinalNote = new JLabel("SELECTED: ");
+		deselectFinalNote = new JButton("DESELECT");
+
+		this.setFinalNote(finalNote);
+
+		JPanel selectPanel = new JPanel(new BorderLayout());
+		JScrollPane pane = new JScrollPane(chosenSelectedFinalNote);
+		pane.setBorder( BorderFactory.createEmptyBorder() );
+		selectPanel.add(pane,BorderLayout.CENTER);
+		Box selectDeselect = Box.createHorizontalBox();
+		selectDeselect.add(selectFinalNote);
+		selectDeselect.add(deselectFinalNote);
+		selectPanel.add(selectDeselect,BorderLayout.EAST);
+		createIdeaNorthSection.add(selectPanel);
+
+
 		/*
 		 * View all notes
 		 */
 		viewAllNotes = new JButton("View all notes");
 		
-		
 		JPanel createIdeaNotePanel = new JPanel(new BorderLayout());
 		createIdeaNotePanel.add(createIdeaNorthSection, BorderLayout.NORTH);
-		createIdeaNotePanel.add(this.notesPanel, BorderLayout.CENTER);
-		createIdeaNotePanel.add(buttonPanel, BorderLayout.EAST);
-		
-		
+
+		this.allNotesList = new DefaultListModel<>();
+		this.allNotes = new SearchList<Note>(allNotesList);
+
+		JPanel panelNotes = new JPanel(new GridLayout(1,2));
+		panelNotes.add(this.notesPanel);
+		panelNotes.add(this.allNotes);
+
+		createIdeaNotePanel.add(panelNotes, BorderLayout.CENTER);
+
 		JPanel createIdeaPanel = new JPanel(new GridLayout(3,1));
 		createIdeaPanel.add(createIdeaNorthSection);
 		createIdeaPanel.add(createIdeaNotePanel);
@@ -254,7 +273,32 @@ public class CreateAnIdeaPage extends JPanel {
 		saveIdea = new JButton("SAVE IDEA");
 		createIdeaSouthSection.add(saveIdea,BorderLayout.SOUTH);
 		createIdeaPanel.add(createIdeaSouthSection);
-		
+
+		allNotes.addMouseListenerForList(
+				new MouseListener() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if(e.getClickCount()==2){
+							List<Note> notes = allNotes.getSelectedValuesList();
+							notesPanel.addNote(notes);
+						}
+					}
+					@Override
+					public void mousePressed(MouseEvent e) {
+					}
+					@Override
+					public void mouseReleased(MouseEvent e) {
+					}
+					@Override
+					public void mouseEntered(MouseEvent e) {
+					}
+					@Override
+					public void mouseExited(MouseEvent e) {
+					}
+				}
+		);
+
+
 		/*
 		 * Page Display:
 		 * ----------------------------------------
@@ -279,7 +323,7 @@ public class CreateAnIdeaPage extends JPanel {
 		 *  |_______________________________________|
 		 */
 
-		this.addNote.addActionListener(handler::addNote);
+
 		this.removeNotes.addActionListener(handler::removeNote);
 		this.addKeyWord.addActionListener(handler::addKeyWord);
 		this.removeKeyWord.addActionListener(handler::removeKeyWord);
@@ -305,38 +349,40 @@ public class CreateAnIdeaPage extends JPanel {
 	 * @param isPromptKeyWord
 	 * @param finalNote
 	 */
-	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,HashMap<Note,Integer>notes, List<String>keyWords, String promptInp,Boolean isPromptKeyWord, Note finalNote) {
-		this.setUpPage(handler,notes, keyWords, promptInp, isPromptKeyWord, finalNote);
+	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,HashMap<Note,Integer>notes, List<String>keyWords, String promptInp,Boolean isPromptKeyWord, Note finalNote,List<Note>allNotes) {
+		this.setUpPage(handler,notes, keyWords, promptInp, isPromptKeyWord, finalNote,allNotes);
 		editIdea = null;
 
 	}
 	
-	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,List<Note>notes, List<String>keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote) {
+	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,List<Note>notes, List<String>keyWords, String promptInp, Boolean isPromptKeyWord, Note finalNote, List<Note>allNotes) {
 		HashMap<Note, Integer> notesMap = new HashMap<Note, Integer>();
 		for(Note n: notes) {
 			notesMap.put(n, Idea.NON_PROMPT_NOTE);
 		}
-		this.setUpPage(handler,notesMap, keyWords, promptInp, isPromptKeyWord, finalNote);
+		this.setUpPage(handler,notesMap, keyWords, promptInp, isPromptKeyWord, finalNote,allNotes);
 		
 		editIdea = null;
 
 	}
 	
-	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler) {
+	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler, List<Note>allNotes) {
 
-		this.setUpPage(handler,null, null, null, null, null);
+		this.setUpPage(handler,null, null, null, null, null,allNotes);
 		
 		editIdea = null;
 
 	}
+
+
 	
 	/**
 	 * Constructor for View.CreateAnIdeaPage built from an Model.Idea object
 	 * Used in program to edit an existing Model.Idea.
 	 * @param idea 
 	 */
-	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,Idea idea) {
-		this.setUpPage(handler,idea.getNotesMap(), idea.getKeyWords(), idea.getPrompt(), idea.getPromptType(), idea.getFinalNote());
+	public CreateAnIdeaPage(CreateAnIdeaEventHandler handler,Idea idea, List<Note>allNotes) {
+		this.setUpPage(handler,idea.getNotesMap(), idea.getKeyWords(), idea.getPrompt(), idea.getPromptType(), idea.getFinalNote(),allNotes);
 		editIdea = idea;
 	}
 
@@ -361,8 +407,8 @@ public class CreateAnIdeaPage extends JPanel {
 	 * @param finalNote - note to be displayed as final note
 	 */
 	public void setFinalNote(Note finalNote) {
-		this.finalNoteModel.clear();
-		this.finalNoteModel.addElement(finalNote);
+		this.finalNote = finalNote;
+		this.chosenSelectedFinalNote.setText( "Final Note: " + (finalNote==null ? "NONE" : finalNote.toString())  );
 	}
 	
 	/**
@@ -370,7 +416,12 @@ public class CreateAnIdeaPage extends JPanel {
 	 * @param note
 	 */
 	public void addNote(Note note) {
+		System.out.println("Adding: " + note);
 		this.notesPanel.addNote(note);
+		if(!this.allNotesList.contains(note)){
+			this.allNotesList.addElement(note);
+		}
+
 	}
 	
 	/**
@@ -379,7 +430,9 @@ public class CreateAnIdeaPage extends JPanel {
 	 */
 	public void removeNote(Note note) {
 		this.notesPanel.removeNote(note);
-		this.finalNoteModel.removeElement(note);
+		if(finalNote==note){
+			this.setFinalNote(null);
+		}
 	}
 	
 	/**
@@ -434,11 +487,8 @@ public class CreateAnIdeaPage extends JPanel {
 			
 		}
 		
-		Note finalNote;
-		if(this.finalNote.getModel().getSize()>0)
-			finalNote = this.finalNote.getModel().getElementAt(0);
-		else
-			finalNote = null;
+		Note finalNote = this.finalNote;
+
 		boolean isPromptKeyWord = this.keyWord.isSelected();
 		
 		if(this.editIdea!=null) {
@@ -458,38 +508,5 @@ public class CreateAnIdeaPage extends JPanel {
 		return createdIdea;
 	}
 	
-	/*
-	 * Lets users provide isteners for all the buttons
-	 */
-	public void addBackActionListener(ActionListener backActionListener) {
-		this.back.addActionListener(backActionListener);
-	}
 
-	public void addAddNoteActionListener(ActionListener addNoteActionListener) {
-		this.addNote.addActionListener(addNoteActionListener);
-	}
-	
-	public void addRemoveNoteActionListener(ActionListener removeNoteActionListener) {
-		this.removeNotes.addActionListener(removeNoteActionListener);
-	}
-	
-	public void addSelectFinalNoteActionListener(ActionListener selectFinalNoteActionListener) {
-		this.selectFinalNote.addActionListener(selectFinalNoteActionListener);
-	}
-	
-	public void addAddKeyWordActionListener(ActionListener addKeyWordActionListener) {
-		this.addKeyWord.addActionListener(addKeyWordActionListener);
-	}
-	
-	public void addRemoveKeyWordsActionListener(ActionListener removeKeyWordsActionListener) {
-		this.removeKeyWord.addActionListener(removeKeyWordsActionListener);
-	}
-	
-	public void addSaveIdeaActionListener(ActionListener saveIdeaActionListener) {
-		this.saveIdea.addActionListener(saveIdeaActionListener);
-	}
-	
-	public void addViewAllNotes(ActionListener viewAllNotesActionListener) {
-		this.viewAllNotes.addActionListener(viewAllNotesActionListener);
-	}
 }
