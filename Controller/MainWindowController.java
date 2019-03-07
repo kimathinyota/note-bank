@@ -1,9 +1,8 @@
 package Controller;
 
+import View.*;
 import View.Handlers.MainWindowEventHandler;
-import View.ManageIdeasPage;
-import View.ManageNoteBankPage;
-import View.NoteBankView;
+import View.Handlers.QuizSetUpEventHandler;
 
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -73,6 +72,21 @@ public class MainWindowController implements MainWindowEventHandler {
         if(! (page instanceof ManageNoteBankPage) ){
             view.getMenus().getIdeaMenu().setEnabled(false);
         }
+
+        boolean isQuizPage = (page instanceof QuizSetUpPage) || (page instanceof QuizResultsPage)
+                        ||  (page instanceof QuizResponsePage) || (page instanceof QuizAnswerEvaluationPage);
+
+
+
+        boolean shouldDisplayNote = !isQuizPage;
+
+        System.out.println(shouldDisplayNote);
+
+        view.getMenus().getViewMenu().getNoteMenu().setEnabled(shouldDisplayNote);
+        view.getMenus().getFileMenu().getNewMenu().setEnabled(shouldDisplayNote);
+        view.getMenus().getEditMenu().getRemoveNotes().setEnabled(shouldDisplayNote);
+
+
 
         boolean canModifyIdeas = page instanceof ManageIdeasPage;
         view.getMenus().getIdeaMenu().setEnabled(canModifyIdeas);

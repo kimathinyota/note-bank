@@ -101,6 +101,5 @@ public class QuizAnswerEvaluationController implements QuizAnswerEvaluationEvent
         }else {
             JOptionPane.showMessageDialog(quizAnswerEvaluationPage, "No final note has been selected");
         }
-
     }
 }

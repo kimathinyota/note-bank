@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 public class FileMenuController {
 
     NoteBankController controller;
+
     public void createSubject(ActionEvent e){
         ManageNoteBankPage manageNoteBankPage = this.controller.getView().manageNoteBankPage;
         NoteBankView view = controller.getView();
@@ -54,4 +55,5 @@ public class FileMenuController {
     public FileMenuController(NoteBankController controller){
         this.controller = controller;
     }
+
 }

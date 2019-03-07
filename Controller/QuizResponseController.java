@@ -29,7 +29,6 @@ public class QuizResponseController implements QuizResponseEventHandler {
     public void quit(ActionEvent e) {
         NoteBankView view = controller.getView();
         view.setFixedPage(view.manageNoteBankPage,"Manage Note Bank Page");
-
     }
 
     @Override
@@ -39,15 +38,13 @@ public class QuizResponseController implements QuizResponseEventHandler {
             JOptionPane.showMessageDialog(quizResponse, "No prompt notes");
             return;
         }
-
         ViewNotesController viewNotesController = new ViewNotesController(controller,quizResponse.getPromptNotes(),false);
-
         view.addFixedPage(viewNotesController.getViewNotes(), "View Prompt Notes");
     }
 
     public QuizResponseController(NoteBankController controller){
         this.controller = controller;
         quizResponse = new QuizResponsePage(this,controller.getCurrentQuizIdea());
-
     }
+
 }

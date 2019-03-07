@@ -19,7 +19,7 @@ public class SearchList<E> extends JPanel {
     public void displayValuesContaining(String word){
         listModel.removeAllElements();
         for(E elem: list){
-            if(elem.toString().toLowerCase().contains(word.toLowerCase())){
+            if(elem!=null && elem.toString().toLowerCase().contains(word.toLowerCase())){
                 listModel.addElement(elem);
             }
         }
@@ -34,6 +34,11 @@ public class SearchList<E> extends JPanel {
             listModel.addElement(elem);
         if(!list.contains(elem))
             list.add(elem);
+    }
+
+    public void removeElement(E elem){
+        listModel.removeElement(elem);
+        list.remove(elem);
     }
 
     public List<E> getSelectedValuesList(){

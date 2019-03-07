@@ -29,7 +29,7 @@ public class MainMenuBar extends JMenuBar {
     }
 
     public FileMenu getFileMenu() {
-        return fileMenu;
+        return this.fileMenu;
     }
 
     public EditMenu getEditMenu() {

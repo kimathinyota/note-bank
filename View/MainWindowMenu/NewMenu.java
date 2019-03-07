@@ -11,9 +11,9 @@ import java.awt.event.KeyEvent;
 
 public class NewMenu extends JMenu {
 
-    JMenuItem note;
-    JMenuItem idea;
-    JMenuItem subject;
+    private JMenuItem note;
+    private JMenuItem idea;
+    private JMenuItem subject;
 
     public JMenuItem getNote() {
         return note;

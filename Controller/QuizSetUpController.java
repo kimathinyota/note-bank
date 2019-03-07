@@ -84,5 +84,6 @@ public class QuizSetUpController implements QuizSetUpEventHandler {
             view.quizSetUpPage.setSliderMinMax(1, selectedItem.getAllIdeas().size());
         }
     }
+
 }
 

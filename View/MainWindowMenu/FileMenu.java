@@ -9,16 +9,26 @@ import java.awt.event.KeyEvent;
 /**
  * Class for FileMenu
  */
-class FileMenu extends JMenu {
+public class FileMenu extends JMenu {
 
     JMenuItem importItem;
     JMenuItem exportItem;
     JMenuItem quitItem;
     NewMenu newMenu;
 
+    public JMenuItem getImportItem() {
+        return importItem;
+    }
 
+    public JMenuItem getExportItem() {
+        return exportItem;
+    }
 
-    public JMenu getNewMenu() {
+    public JMenuItem getQuitItem() {
+        return quitItem;
+    }
+
+    public NewMenu getNewMenu() {
         return newMenu;
     }
 

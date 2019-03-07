@@ -18,22 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 /**
  * 
- * View.CreateAnIdeaPage:
+ * CreateAnIdeaPage:
  * Page for creating an idea
  *  - Back button
  *  - Enter prompt
@@ -202,6 +191,7 @@ public class CreateAnIdeaPage extends JPanel {
 		selectFinalNote = new JButton("SELECT");
 
 		chosenSelectedFinalNote = new JLabel("SELECTED: ");
+		chosenSelectedFinalNote.setHorizontalAlignment(SwingConstants.CENTER);
 		deselectFinalNote = new JButton("DESELECT");
 
 		this.setFinalNote(finalNote);
@@ -421,6 +411,7 @@ public class CreateAnIdeaPage extends JPanel {
 		if(!this.allNotesList.contains(note)){
 			this.allNotesList.addElement(note);
 		}
+		this.allNotes.addElement(note);
 
 	}
 	
@@ -433,6 +424,7 @@ public class CreateAnIdeaPage extends JPanel {
 		if(finalNote==note){
 			this.setFinalNote(null);
 		}
+		this.allNotes.removeElement(note);
 	}
 	
 	/**

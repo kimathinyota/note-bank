@@ -11,7 +11,6 @@ public class ViewMenuController{
     NoteBankController controller;
 
     public void subjectSelected(ItemEvent e) {
-
         if (e.getStateChange() == ItemEvent.SELECTED) {
 
             NoteBankView view = controller.getView();
@@ -39,7 +38,6 @@ public class ViewMenuController{
             manageNoteBankPage.refreshNotesListView();
             controller.updateSubjectFile();
         }
-
     }
 
     public void viewNotes(){
@@ -57,4 +55,5 @@ public class ViewMenuController{
     public ViewMenuController(NoteBankController controller){
         this.controller = controller;
     }
+
 }
